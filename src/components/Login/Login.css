@@ -1,0 +1,17 @@
+form {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    padding: 1em 3em;
+    margin: 1em 25%;
+}
+
+#password, #email {
+
+    width: 100%;
+}
+
+.vstack {
+    display: flex;
+    justify-content: center;
+}
