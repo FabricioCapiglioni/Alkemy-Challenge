@@ -16,7 +16,7 @@ export const HeroContext = ({children}) => {
         const { email, password } = values;
         
         getToken(email, password).then(response => { 
-            localStorage.setItem("token", response.message.token);
+            localStorage.setItem("token", response);
             setUser(true)
             setNotification()
         }).catch(error => {
