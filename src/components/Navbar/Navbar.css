@@ -8,4 +8,5 @@
 
 .logOut label {
     font-size: 1rem;
+    cursor: pointer;
 }

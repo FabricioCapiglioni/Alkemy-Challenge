@@ -1,17 +1,19 @@
+import {useContext, useEffect} from 'react'
+import Context from '../../context/HeroContext'
 import './Navbar.css'
 import Container from 'react-bootstrap/Container'
 import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
-import React from 'react'
 import { MdLogout } from "react-icons/all"
 
 
-const NavBar = ({setUser}) => {
+const NavBar = () => {
 
-  const logout = () => {
-    localStorage.clear();
-    setUser(false);
-  };
+  const {user, logout} = useContext(Context)
+
+  useEffect(() => {    
+  }, [user])
+  
     return (
         <Navbar variant="dark" expand="lg">
         <Container>
@@ -21,10 +23,13 @@ const NavBar = ({setUser}) => {
                 <Nav.Link href="#home">My Team</Nav.Link>
             </Nav>
           </Navbar.Collapse>
-          <div className="logOut" onClick={logout} >
-            <label>Log Out</label>
-            <MdLogout />
-          </div>
+          {user ?
+            <div className="logOut" onClick={logout} >
+              <label>Log Out</label>
+              <MdLogout />
+            </div>
+            : null
+          }
         </Container>
       </Navbar>
     )
