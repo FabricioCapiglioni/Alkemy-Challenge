@@ -1,16 +1,9 @@
 import axios from "axios";
 
-axios.defaults.headers = {
-  'Content-Type': 'application/json',
-  Authorization: '10158625777930823'
-}
-
-const baseUrl = 'https://superheroapi.com/api/10158625777930823'
-
 export const searchHero = async(name) => {
   try {
-      const response = await axios.get(`${baseUrl}/search/${name}`)
-      return response.data
+      const response = await axios.get(`http://localhost:5000/${name}`)
+      return response
   }
   catch (error) {
       console.log(error)
@@ -23,15 +16,12 @@ export const getToken = async(email, password) => {
           email,
           password
       })
-      console.log(res.data)
       let data = res.data.token
       return data
   }
   catch (error) {
-      let data = {
-          status: error.response.status,
-          message: error.response.data
-      }
+      let data = error.response.data
+      
       return data
   }
 }
