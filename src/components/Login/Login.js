@@ -1,7 +1,8 @@
-import {useContext, useEffect} from 'react'
-import { Redirect } from 'react-router-dom'
+import {useContext} from 'react'
+import { useHistory } from 'react-router';
 import Context from '../../context/HeroContext'
 import { Formik, Field, Form, ErrorMessage } from 'formik'
+import Notification from '../Notification/Notification'
 
 import './Login.css'
 import Col from 'react-bootstrap/Col'
@@ -11,18 +12,32 @@ import Button from 'react-bootstrap/Button'
 
 const Login = () => {
 
-    const {login, user} = useContext(Context)
+    const history = useHistory();
+    const {getToken, setNotification} = useContext(Context)
     const email= 'challenge@alkemy.org'
     const password= 'react'
 
-    useEffect(() => {    
-    }, [user])
+
+    const login = (values) => {
+
+        const { email, password } = values;
+       
+        setNotification("spinner", "Processing", 2000) 
+
+        getToken(email, password).then(response => { 
+            localStorage.setItem("token", response);
+            history.push('/')    
+            setNotification()
+        }).catch(error => {
+            alert(error);
+        })    
+    }
+
+    
 
     return (
         <>
-        {user ? 
-            <Redirect to="/" />
-        :
+        <Notification />
             <Formik 
                 initialValues={{
                     email: '',
@@ -79,10 +94,8 @@ const Login = () => {
                         <Button type="submit" variant="primary">Submit</Button>
                     </Stack>
                 </Form>
-            )}
-                
-            </Formik>
-        }
+            )} 
+        </Formik>
         </>
     )
 }

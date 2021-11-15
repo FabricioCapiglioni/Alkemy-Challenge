@@ -1,36 +1,32 @@
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import {HeroContext} from './context/HeroContext'
+import { Router } from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom';
+import { createBrowserHistory } from 'history';
+import { HeroContext } from './context/HeroContext'
 
-import LoginRoute from './components/LoginRoute/LoginRoute'
-import NavBar from './components/Navbar/Navbar';
-import Notification from './components/Notification/Notification';
-import Home from './components/Home/Home';
+import HeroesContainer from './components/HeroesContainer/HeroesContainer';
 import Login from './components/Login/Login'
 
-
-import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
+
+
+const history = createBrowserHistory();
 
 function App() {
-  
-  return (
-    <div className="App">
-      <HeroContext>
-        <BrowserRouter>
-          <header className="App-header">
-            <NavBar />
-          </header>
-          <main>
-            <Notification />
-            <Switch>
-              <LoginRoute exact path='/' component={Home} />
-              <Route path='/login' component={Login} />
-            </Switch>
-          </main>
-          </BrowserRouter>
-        </HeroContext>
-    </div>
-  );
+
+    return (
+        <div className="App">
+            <HeroContext>
+                <Router history={history}>
+                    <Switch>
+                        <Route exact path='/' component={HeroesContainer} />
+                        <Route path='/team/:path' component={HeroesContainer} />
+                        <Route exact path='/login' component={Login} />
+                    </Switch>
+                </Router>
+            </HeroContext>
+        </div>
+    );
 }
 
 export default App;

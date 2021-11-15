@@ -1,67 +1,69 @@
 import React, { useState } from 'react'
-import { searchHero, getToken } from '../assets/SuperHero API'
-
+import axios from "axios";
 
 const Context = React.createContext()
 
-export const HeroContext = ({children}) => {
-    
+export const HeroContext = ({ children }) => {
+
     const [heroes, setHeroes] = useState([])
-    const [user, setUser] = useState(false)
+    const [team, setTeam] = useState([])
     const [message, setMessage] = useState('')
     const [type, setType] = useState('')
 
-    const login = (values) => {
-        setNotification("spinner", "Processing", 2000) 
-        const { email, password } = values;
-        
-        getToken(email, password).then(response => { 
-            localStorage.setItem("token", response);
-            setUser(true)
-            setNotification()
-        }).catch(error => {
-            alert(error);
-        })    
+    const token = localStorage.getItem('token');
+
+
+    const getToken = async (email, password) => {
+        try {
+            const res = await axios.post(`http://challenge-react.alkemy.org/`, {
+                email,
+                password
+            })
+            let data = res.data.token
+            return data
+        }
+        catch (error) {
+            let data = error.response.data
+
+            return data
+        }
     }
 
-    const logout = () => {
-        setNotification("check", "See you soon", 3000)
-        localStorage.clear();        
-        setTimeout(() => {
-            setUser(false)
-        }, 500);
-    };
-
-    const search = (name) => {
-        searchHero(name).then(response => { 
-           setHeroes(response)
-        }).catch(error => {
-            alert(error);
-        })    
+    const search = async (name) => {
+        axios
+            .get(`http://localhost:5000/${name}`)
+            .then((response) => {
+                console.log(response.data.results)
+                const newHeroes = [...response.data.results, ...heroes]
+                setHeroes(newHeroes)
+            }).catch((error) => {
+                alert(error)
+            })
     }
 
-    const setNotification = ( type, message, sec ) => {
+    const setNotification = (type, message, sec) => {
         window.scrollTo(0, 0);
         setType(type)
-        setMessage(message)        
+        setMessage(message)
         setTimeout(() => {
             setMessage('')
-        }, sec) 
+        }, sec)
     }
 
+    
+
     return (
-        <Context.Provider 
+        <Context.Provider
             value={{
-                login,
-                logout,
+                token,
+                getToken,
                 search,
-                user,
                 heroes,
-                notification: {
-                    message,
-                    type
-                },
-               setNotification,
+                setHeroes,
+                team,
+                setTeam,
+                notification: { message, type },
+                setNotification,
             }}
         >
             {children}
