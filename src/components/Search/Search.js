@@ -1,4 +1,4 @@
-import { useContext, } from 'react'
+import { useContext, useState } from 'react'
 
 import Stack from 'react-bootstrap/Stack'
 import Button from 'react-bootstrap/Button'
@@ -10,7 +10,8 @@ import './Search.css'
 
 const Search = () => {
 
-    const { search } = useContext(Context)
+    const { search, alreadySerched, setNotification } = useContext(Context)
+    const [serchedWords, SetSerchedWords] = useState([])
 
     return (
         <Formik
@@ -18,8 +19,13 @@ const Search = () => {
                 name: '',
             }}
             onSubmit={(values, { resetForm }) => {
-                search(values.name)
-                resetForm();
+                if (alreadySerched(values.name, serchedWords)) {
+                    return setNotification('error', `You already search the word: '${values.name}'`, 3000)
+                }else {
+                    SetSerchedWords(values.name)
+                    search(values.name)
+                    resetForm();
+                }                
             }}
         >
             {() => (
