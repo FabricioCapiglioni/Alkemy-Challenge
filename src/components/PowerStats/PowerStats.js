@@ -1,35 +1,30 @@
+import { useContext } from 'react'
+import Context from '../../context/HeroContext'
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import './PowerStats.css'
 
-const PowerStats = () => {
+const PowerStats = ({powerstats}) => {
 
-    const powerstats = {
-        intelligence: "100",
-        strength: "85",
-        speed: "58",
-        combat: "64",
-        durability: "85",
-        power: "100",
-    }
+    const { capt } = useContext(Context)
 
+    //Transformo el objeto de powerstats en un array para poder mapearlo.
     const newPowerstats = Object.entries(powerstats).map(function (element) {
         return {
             name: element[0],
-            stat: element[1]
+            stat: element[1],
         };
     })
 
-    function capt(word) {
-        return word.charAt(0).toUpperCase() + word.slice(1);
-        }
-
     return (
-    <>
-        
-        {newPowerstats.map((stat)=> (
-            <ProgressBar variant='success' now={stat.stat} label={`${capt(stat.name)}: ${stat.stat}`} />
-        ))}
-    </>
+
+        <>{
+            newPowerstats.map((stat, index)=> (
+            <div key={index}>
+                <label>{`${capt(stat.name)}: ${stat.stat}`}</label>
+                <ProgressBar variant='danger' now={stat.stat}  />
+            </div>))
+            }        
+        </>
     )
 }
 

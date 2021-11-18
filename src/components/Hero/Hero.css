@@ -5,3 +5,8 @@
 .card-title {
     text-align: center;
 }
+
+.card-img-top {
+    min-height:  306.667px;
+    max-height: 306.667px;
+}
