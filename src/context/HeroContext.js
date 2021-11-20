@@ -11,6 +11,16 @@ export const HeroContext = ({ children }) => {
     const [bad, setBad] = useState([])
     const [message, setMessage] = useState('')
     const [type, setType] = useState('')
+    const [teamPowerstats, setTeamPowerstats] = useState({
+        intelligence: 0,
+        strength: 0,
+        speed: 0,
+        durability: 0,
+        power: 0,
+        combat: 0,
+        averageWeight: 0,
+        averageHeight: 0,
+    })
 
     const token = localStorage.getItem('token');
 
@@ -38,11 +48,15 @@ export const HeroContext = ({ children }) => {
         axios
             .get(`http://localhost:5000/${name}`)
             .then((response) => {
-                let newHeroes = discardHeroes([...response.data.results])
-                console.log(newHeroes)
-                setHeroes(newHeroes)
+                console.log(response.data.results);
+                if (response.data.response === 'success') {
+                    let newHeroes = discardHeroes([...response.data.results])
+                    setHeroes(newHeroes)
+                } else {
+                    setNotification('error', response.data.error, 4000)()
+                }
             }).catch((error) => {
-                setNotification('error', error, 2000)
+                console.log(error)
             })
     }
 
@@ -87,12 +101,13 @@ export const HeroContext = ({ children }) => {
     }
 
     //Función para agregar heroe al team. 
-    //Tambien se agrega al estado que pertenezca, según 
-    //su alineación.
+    //Agrega el heroe al estado good o bad, según sea su alineación.
+    //Ejecuta la función setTeamStats
     const addHero = (object) => {
 
         const newTeam = [...team, object]
         setTeam(newTeam)
+        setTeamstats(object, '+')
         if (object.biography.alignment === 'good') {
             setGood([...good, object])
         } else setBad([...bad, object])
@@ -102,7 +117,10 @@ export const HeroContext = ({ children }) => {
     const deleteHeroFromTeam = (object) => {
         const updateTeam = team.filter((hero) => (hero.id !== object.id))
         setTeam(updateTeam)
-
+        setTeamstats(object, '-')
+        if (team === 0) {
+            setTeamPowerstats(0)
+        }
         if (object.biography.alignment === 'good') {
             const newArr = good.filter((hero) => (hero.id !== object.id))
             setGood(newArr)
@@ -110,6 +128,37 @@ export const HeroContext = ({ children }) => {
             const newArr = bad.filter((hero) => (hero.id !== object.id))
             setBad(newArr)
         }
+    }
+
+    //Función para setear el estado teamPowerstats, el cual acumula cada powerstats
+    //a medida que cada heroe es agregado al team, tambien acumula el peso y la alturadel team
+    //Al momento de renderizar estos últimos 2, se calcula el promedio dividiendo su value por
+    //team.length
+    const setTeamstats = (object, operator) => {
+
+        if (operator === '+') {
+            setTeamPowerstats({
+                intelligence:  parseInt(object.powerstats.intelligence) + teamPowerstats.intelligence ,
+                strength:  parseInt(object.powerstats.strength) + teamPowerstats.strength,
+                speed: parseInt(object.powerstats.speed) + teamPowerstats.speed,
+                durability: parseInt(object.powerstats.durability) + teamPowerstats.durability,
+                power: parseInt(object.powerstats.power) + teamPowerstats.power,
+                combat: parseInt(object.powerstats.combat) + teamPowerstats.combat,
+                averageWeight: parseInt((object.appearance.weight[1]).replace(' kg')) + teamPowerstats.averageWeight,
+                averageHeight: parseInt((object.appearance.height[1]).replace(' cm')) + teamPowerstats.averageHeight,
+            })
+        } else {
+            setTeamPowerstats({
+                intelligence: teamPowerstats.intelligence - parseInt(object.powerstats.intelligence),
+                strength: (teamPowerstats.strength - parseInt(object.powerstats.strength)),
+                speed: (teamPowerstats.speed - parseInt(object.powerstats.speed)),
+                durability: (teamPowerstats.durability - parseInt(object.powerstats.durability)),
+                power: (teamPowerstats.power - parseInt(object.powerstats.power)),
+                combat: (teamPowerstats.combat - parseInt(object.powerstats.combat)),
+                averageWeight: teamPowerstats.averageWeight - parseInt((object.appearance.weight[1]).replace(' kg')),
+                averageHeight: teamPowerstats.averageHeight - parseInt((object.appearance.height[1]).replace(' cm'))
+            })
+        }        
     }
 
     //Función para hacer mayúscula la primera letra de una palabra
@@ -126,53 +175,9 @@ export const HeroContext = ({ children }) => {
         }, sec)
     }
 
-    /* const filterSameHeroes = (array) => {
-        const idInHeroes = heroes.map((hero) => hero.id)
-        let newArray = array.filter(object => !idInHeroes.includes(object.id))
-        return newArray
-    } */
 
-    //Función para sacar el promedio de powerstats del team (sin utilizar)
-    /* const averagePowerstats = () => {
     
-        let powerstats= []
-        team.forEach(element => {
-            powerstats = [...powerstats, element.powerstats]  
-            return powerstats       
-        });        
-    
-        let intelligence =  0
-        let strength = 0
-        let speed = 0
-        let durability = 0
-        let power = 0
-        let combat = 0
-    
-        const newPowerstats = powerstats.map((stat) => {
-            
-            intelligence =  intelligence + parseInt(stat.intelligence)
-            strength = strength + parseInt(stat.strength)
-            speed = speed + parseInt(stat.speed)
-            durability = durability + parseInt(stat.durability)
-            power = power + parseInt(stat.power)
-            combat = combat + parseInt(stat.combat)
-    
-            return [
-                intelligence,
-                strength,
-                speed,
-                durability,
-                power,
-                combat,
-            ]
-        })
-    
-        const statAverages = newPowerstats[newPowerstats.length - 1].map(function (element) {
-            return element/newPowerstats.length
-        })
-    
-        return statAverages
-    } */
+   
 
     return (
         <Context.Provider
@@ -183,6 +188,7 @@ export const HeroContext = ({ children }) => {
                 setTeam,
                 good,
                 bad,
+                teamPowerstats,
                 token,
                 getToken,
                 search,
@@ -192,6 +198,7 @@ export const HeroContext = ({ children }) => {
                 filterHeroesByalignment,
                 addHero,
                 deleteHeroFromTeam,
+                setTeamstats,
                 capt,
                 notification: { message, type },
                 setNotification,

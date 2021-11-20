@@ -19,11 +19,11 @@ const Search = () => {
                 name: '',
             }}
             onSubmit={(values, { resetForm }) => {
-                if (alreadySerched(values.name, serchedWords)) {
+                if (alreadySerched((values.name).toLowerCase(), serchedWords)) {
                     return setNotification('error', `You already search the word: '${values.name}'`, 3000)
                 }else {
-                    SetSerchedWords(values.name)
-                    search(values.name)
+                    SetSerchedWords((values.name).toLowerCase())
+                    search((values.name).toLowerCase())
                     resetForm();
                 }                
             }}

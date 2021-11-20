@@ -41,9 +41,9 @@ const Hero = ({ hero }) => {
     return (
         <Card style={{ width: '18rem' }}>
             <Card.Body>
-                <Card.Title>{hero.name}({hero.biography.alignment})</Card.Title>
+                <Card.Title>{hero.name} ({hero.biography.alignment})</Card.Title>
                 <Card.Img className="cadImg" variant="top" src={`${hero.image.url}`} />
-                <PowerStats powerstats={hero.powerstats} />
+                <PowerStats powerstats={hero.powerstats} max={100} />
                 <Button className="col-sm-5  me-3" variant="primary" onClick={handleShow}>
                     Details
                 </Button>
